@@ -1,0 +1,18 @@
+Target of FE:
+	given a text script, output a string of transcription with prosody boundary, word boundary, part of speech etc. information.
+	the output can be used by BE to synthesize natural speeches.
+
+Pipeline:
+	1. text preprocessing. input text cannot always be orthographic. usually numbers and alphabets and symbols can be inserted inside the Chinese characters. we need to recognize them all and divide them into different parts to deal with. for example, we need to do the text normalization for numbers, symbols and alphabets.
+		i) input: common texts. for example: 今天天气不错，可见度有500m，我要去atm取钱出去玩。
+		ii) output: parts of different categories. for example: "今天天气不错，", "可见度有", "500m，", "我要去", "atm", "取钱出去玩"
+	2. text normalization. after we have got the parts of different categories, we need to deal with "500m" and "atm" firstly. we need to either translate them into orthographic Chinese "五百米" and "自动取款机" or just give the transcription of "atm" as "[ei-thi-em]. then we combine "五百米" together with "可见度有" and "我要去", "自动取款机（or just [ei-thi-em] in the last step)" together with "取钱出去玩".
+		i) input: divided parts of sentences, for example: ["今天天气不错，", "可见度有", "500m，", "我要去", "atm", "取钱出去玩"]
+		ii) output: seperated parts by punctuations of comma, sentence mark or question marks. for example: ["今天天气不错，", "可见度有五百米，", "我要去自动取款机取钱出去玩。"]
+	3. word segmentation and pos tagging. after getting the sperated parts of sentences, segment these parts into words with POS together. I would like to try HMM model for this task.
+		i) input: orthographic texts. for example: 今天天气不错。
+		ii) output: words with POS. for example: 今天/t 天气/n 不错/a 。/w
+	4. syntax tree analysis. given words and their POS and sematic properties (maybe we will add modules on semantic properties on each word), we try to build a syntax tree here.
+		i) input: lists of words with POS.
+		ii) output: syntax tree. for example: [[今天/t]]/NP [[天气]/n [不错]/a]/VP.
+	5. prosodic tree prediction (with sematic analysis). we will predict the prosody structures for each sentences. everyone knows it's very important for TTS.
